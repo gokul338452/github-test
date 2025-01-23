@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weight Handling Fee Calculator</title>
+  <script>
+    // Function to calculate D11: Volume-based value
+    function calculateD11(length, breadth, height) {
+      return (length * breadth * height) / 5;
+    }
+
+    // Function to calculate D12: Maximum value
+    function calculateD12(d9, d11) {
+      return Math.max(d9, d11);
+    }
+
+    // Function to calculate D13: Weight handling fee range
+    function calculateD13(d12, d14) {
+      if (d14 === "Standard") {
+        if (d12 <= 500) {
+          return "Upto 500g";
+        } else if (d12 <= 1000) {
+          return "Above 500 g and upto 1000 g";
+        } else {
+          let lowerBound = Math.floor((d12 - 0.01) / 1000) * 1000;
+          let upperBound = (Math.floor((d12 - 0.01) / 1000) + 1) * 1000;
+          return `Above ${lowerBound} g and upto ${upperBound} g`;
+        }
+      } else {
+        if (d12 <= 12000) {
+          return "Upto 12 kg";
+        } else {
+          let lowerBound = Math.floor(d12 / 1000);
+          let upperBound = lowerBound + 1;
+          return `Above ${lowerBound} kg upto ${upperBound} kg`;
+        }
+      }
+    }
+
+    // Function to calculate tax (D18) and total (D19)
+    function calculateTaxAndTotal(d17) {
+      let tax = d17 * 0.18;
+      let total = d17 + tax;
+      return { tax, total };
+    }
+
+    // Example usage
+    function calculate() {
+      // Input values
+      let length = parseFloat(document.getElementById("length").value);
+      let breadth = parseFloat(document.getElementById("breadth").value);
+      let height = parseFloat(document.getElementById("height").value);
+      let d9 = parseFloat(document.getElementById("d9").value);
+      let d14 = document.getElementById("d14").value;
+
+      // Calculations
+      let d11 = calculateD11(length, breadth, height);
+      let d12 = calculateD12(d9, d11);
+      let d13 = calculateD13(d12, d14);
+      let d17 = d12; // Assuming D17 = D12 for demonstration
+      let { tax, total } = calculateTaxAndTotal(d17);
+
+      // Output results
+      document.getElementById("outputD11").innerText = d11.toFixed(2);
+      document.getElementById("outputD12").innerText = d12.toFixed(2);
+      document.getElementById("outputD13").innerText = d13;
+      document.getElementById("outputTax").innerText = tax.toFixed(2);
+      document.getElementById("outputTotal").innerText = total.toFixed(2);
+    }
+  </script>
+</head>
+<body>
+  <h1>Weight Handling Fee Calculator</h1>
+  <form onsubmit="event.preventDefault(); calculate();">
+    <label for="length">Length (cm):</label>
+    <input type="number" id="length" required><br><br>
+
+    <label for="breadth">Breadth (cm):</label>
+    <input type="number" id="breadth" required><br><br>
+
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height" required><br><br>
+
+    <label for="d9">D9 Value:</label>
+    <input type="number" id="d9" required><br><br>
+
+    <label for="d14">Shipping Type (e.g., "Standard"):</label>
+    <input type="text" id="d14" required><br><br>
+
+    <button type="submit">Calculate</button>
+  </form>
+
+  <h2>Results:</h2>
+  <p>D11 (Volume-based value): <span id="outputD11"></span></p>
+  <p>D12 (Max value): <span id="outputD12"></span></p>
+  <p>D13 (Weight range): <span id="outputD13"></span></p>
+  <p>Tax (D18): <span id="outputTax"></span></p>
+  <p>Total (D19): <span id="outputTotal"></span></p>
+</body>
+</html>
